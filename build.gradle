@@ -1,0 +1,165 @@
+plugins {
+    id 'net.fabricmc.fabric-loom' version '1.18.2'
+    id 'maven-publish'
+}
+
+version = project.mod_version + "+" + project.minecraft_version
+group = project.maven_group
+
+base {
+    archivesName = project.archives_base_name
+}
+
+repositories {
+    maven { url 'https://maven.nucleoid.xyz' }
+    maven {
+        name 'Xander Maven'
+        url 'https://maven.isxander.dev/releases'
+    }
+    maven { url 'https://repo.biryeong.kim/releases/' }
+    exclusiveContent {
+        forRepository {
+            ivy {
+                name = 'BIL GitHub Releases'
+                url = 'https://github.com/tomalbrc/blockbench-import-library/releases/download/'
+                patternLayout {
+                    artifact 'v[revision]/[artifact]-[revision](-[classifier]).[ext]'
+                }
+                metadataSources { artifact() }
+            }
+        }
+        filter { includeModule 'de.tomalbrc', 'blockbench-import-library' }
+    }
+    maven { url 'https://maven.supersanta.me/snapshots' }
+    maven { url 'https://jitpack.io' }
+    maven {
+        name 'Kneelawk Maven'
+        url 'https://kneelawk.com/maven/'
+    }
+    maven {
+        name 'Resourceful Bees Maven'
+        url 'https://maven.resourcefulbees.com/repository/maven-public/'
+    }
+    maven {
+        name 'AlexIIL Maven'
+        url 'https://maven.alexiil.uk/'
+    }
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'Modrinth'
+                url = 'https://api.modrinth.com/maven'
+            }
+        }
+        filter { includeGroup 'maven.modrinth' }
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+    implementation "eu.pb4:polymer-core:${project.polymer_version}"
+    implementation "eu.pb4:polymer-virtual-entity:${project.polymer_version}"
+    implementation "eu.pb4:polymer-resource-pack:${project.polymer_version}"
+    implementation "eu.pb4:polymer-resource-pack-extras:${project.polymer_version}"
+    implementation "eu.pb4:polymer-autohost:${project.polymer_version}"
+    implementation "eu.pb4:polymer-blocks:${project.polymer_version}"
+
+    implementation include("xyz.nucleoid:server-translations-api:${project.server_translations_version}")
+    implementation include("xyz.nucleoid:stimuli:${project.stimuli_version}")
+    implementation include("de.tomalbrc:DialogUtils:${project.dialogutils_version}")
+    implementation include("eu.pb4:sgui:${project.sgui_version}")
+    implementation include("net.kyori:adventure-platform-fabric:${project.adventure_platform_version}")
+    implementation "net.kyori:adventure-text-minimessage:${project.adventure_api_version}"
+    implementation "net.kyori:adventure-api:${project.adventure_api_version}"
+    implementation include("xyz.nucleoid:fantasy:${project.fantasy_version}")
+    implementation include("xyz.nucleoid:map-templates:${project.map_templates}")
+    implementation include("eu.pb4:sidebar-api:${project.sidebar_api_version}")
+    implementation include("de.tomalbrc:avatar-renderer:${project.avatar_renderer_version}")
+    implementation include("eu.pb4:map-canvas-api:${project.map_canvas_api_version}")
+    implementation include("de.tomalbrc:blockbench-import-library:${project.bli_version}")
+    implementation include("me.lucko:fabric-permissions-api:0.7.0")
+    implementation include("eu.pb4:placeholder-api:3.2.0+26.3")
+    implementation include("kim.biryeong:minigame-lib:1.0.2+26.3")
+    implementation include("kim.biryeong:GCB-server:1.2.0+26.3")
+    implementation include("eu.pb4:player-data-api:0.11.0+26.2")
+    implementation("com.teamresourceful.resourcefullib:resourcefullib-fabric-26.3:${project.resourceful_lib_version}") {
+        transitive = false
+    }
+    implementation "eu.pb4:factorytools:${project.factorytools_version}"
+    implementation "dev.isxander:yet-another-config-lib:${project.yacl_version}"
+    implementation "net.mcbrincie.apel:apel:${project.apel_version}"
+
+    // Development only; not included in the distributed JAR.
+    localRuntime "maven.modrinth:carpet:26.3"
+
+    implementation include("io.hypersistence:hypersistence-tsid:2.1.4")
+    implementation include("org.xerial:sqlite-jdbc:3.46.1.0")
+    testImplementation "org.junit.jupiter:junit-jupiter:5.10.3"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher:1.10.3"
+}
+
+test {
+    useJUnitPlatform()
+}
+
+fabricApi {
+    configureTests {
+        createSourceSet = true
+        modId = "${project.archives_base_name}-gametest"
+        enableGameTests = true
+        enableClientGameTests = false
+        eula = true
+    }
+}
+
+processResources {
+    inputs.property "version", project.version
+    inputs.property "mod_id", project.archives_base_name
+    inputs.property "minecraft_version", project.minecraft_version
+    inputs.property "loader_version", project.loader_version
+    filteringCharset "UTF-8"
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version,
+                "mod_id": project.archives_base_name,
+                "minecraft_version": project.minecraft_version,
+                "loader_version": project.loader_version
+    }
+}
+
+def targetJavaVersion = 25
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding = "UTF-8"
+    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
+        it.options.release.set(targetJavaVersion)
+    }
+}
+
+java {
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+    withSourcesJar()
+}
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.archives_base_name}" }
+    }
+}
+
+publishing {
+    publications {
+        create("mavenJava", MavenPublication) {
+            artifactId = project.archives_base_name
+            from components.java
+        }
+    }
+    repositories {
+        // Configure your publication destination here; keep credentials outside Git.
+    }
+}

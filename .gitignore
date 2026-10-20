@@ -1,0 +1,17 @@
+.DS_Store
+.gradle/
+build/
+run/
+logs/
+.idea/
+.vscode/
+out/
+*.iml
+.idea_modules/
+hs_err_pid*
+replay_pid*
+.env
+.env.*
+!.env.example
+*.jks
+*.keystore

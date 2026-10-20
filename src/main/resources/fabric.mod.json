@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${version}",
+  "name": "Minigame Template",
+  "description": "Server-side minigame starter using the Semion TD library stack.",
+  "authors": ["biryeongtrain"],
+  "contact": {
+    "sources": "https://github.com/biryeongtrain/minigame-template",
+    "issues": "https://github.com/biryeongtrain/minigame-template/issues"
+  },
+  "license": "All-Rights-Reserved",
+  "environment": "server",
+  "entrypoints": {
+    "main": ["kim.biryeong.minigame.MinigameTemplate"]
+  },
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "java": ">=25",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}",
+    "sgui": "*",
+    "bil": "*",
+    "polymer-core": "*",
+    "polymer-networking": "*",
+    "polymer-resource-pack": "*",
+    "polymer-virtual-entity": "*",
+    "placeholder-api": ">=3.2.0+26.3",
+    "sidebar-api": ">=0.6.0+26.1",
+    "factorytools": ">=0.12.1+26.3",
+    "minigamelib": ">=1.0.2+26.3",
+    "gcb-server": ">=1.2.0+26.3",
+    "fabric-permissions-api-v0": ">=0.7.0",
+    "apel": "=0.1.5+26.3"
+  }
+}

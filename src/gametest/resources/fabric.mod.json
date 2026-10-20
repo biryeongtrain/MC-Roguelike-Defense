@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "id": "minigame-template-gametest",
+  "version": "1.0.0",
+  "name": "Minigame Template GameTests",
+  "environment": "server",
+  "entrypoints": {
+    "fabric-gametest": ["kim.biryeong.minigame.TemplateGameTest"]
+  },
+  "depends": {
+    "minigame-template": "*"
+  }
+}
